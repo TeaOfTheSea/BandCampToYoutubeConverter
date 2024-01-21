@@ -25,8 +25,14 @@ def main():
         else:
             print("WARNING: \'" + file + "\' is a weird file!")
 
+    #check for any extra dashes in the file name before using the dashes as a delimeter
+    dashindex = 2
+    if music[0].count("-") > 2:
+        print("Extra dashes were found in filenames, which dash should be used to find the track number?")
+        dashindex = int(input(""))
+
     #Sort music list before we make the video or tracklist for hopefully obvious reasons
-    music = quicksort(music)
+    music = quicksort(music, dashindex)
 
     with open(cwd+"/tracklist.txt", 'w') as tracklist:
         for track in music:
@@ -71,19 +77,19 @@ def main():
     os.remove(cwd+"/concat.wav")
     os.remove(cwd+"/tracklist.txt")
 
-def quicksort(arr):
+def quicksort(arr, dashindex):
     if len(arr) <= 1:
         return arr
     else:
         pivot = arr[0]
-        pivotValue = getTrackNumber(arr[0])
-        less = [x for x in arr[1:] if getTrackNumber(x) <= pivotValue]
-        greater = [x for x in arr[1:] if getTrackNumber(x) > pivotValue]
-        return quicksort(less) + [pivot] + quicksort(greater)
+        pivotValue = getTrackNumber(arr[0], dashindex)
+        less = [x for x in arr[1:] if getTrackNumber(x, dashindex) <= pivotValue]
+        greater = [x for x in arr[1:] if getTrackNumber(x, dashindex) > pivotValue]
+        return quicksort(less, dashindex) + [pivot] + quicksort(greater, dashindex)
 
-def getTrackNumber(file):
+def getTrackNumber(file, dashindex):
     index = 0
-    for i in range(0,2): #Find the second index of "-"
+    for i in range(0, dashindex): #Find the second index of "-"
         index = file.find("-", index+1)
     return int(file[index+2:index+4]) #Using the index of the second index of the dash, we know where the track number is.
 
